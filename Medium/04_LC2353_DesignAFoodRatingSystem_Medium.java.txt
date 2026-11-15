@@ -1,0 +1,51 @@
+
+
+import java.util.*;
+
+class FoodRatings {
+
+    private static class Food {
+        final String name;
+        final int rating;
+
+        Food(String name, int rating) {
+            this.name = name;
+            this.rating = rating;
+        }
+    }
+
+    private final Map<String, String> foodToCuisine = new HashMap<>();
+    private final Map<String, Integer> foodToRating = new HashMap<>();
+    private final Map<String, TreeSet<Food>> cuisineToFoods = new HashMap<>();
+
+    public FoodRatings(String[] foods, String[] cuisines, int[] ratings) {
+        for (int i = 0; i < foods.length; i++) {
+            foodToCuisine.put(foods[i], cuisines[i]);
+            foodToRating.put(foods[i], ratings[i]);
+
+            cuisineToFoods
+                .computeIfAbsent(cuisines[i], k -> new TreeSet<>((a, b) -> {
+                    if (a.rating != b.rating) {
+                        return Integer.compare(b.rating, a.rating);
+                    }
+                    return a.name.compareTo(b.name);
+                }))
+                .add(new Food(foods[i], ratings[i]));
+        }
+    }
+
+    public void changeRating(String food, int newRating) {
+        String cuisine = foodToCuisine.get(food);
+        int oldRating = foodToRating.get(food);
+        TreeSet<Food> set = cuisineToFoods.get(cuisine);
+
+        set.remove(new Food(food, oldRating));
+        set.add(new Food(food, newRating));
+        foodToRating.put(food, newRating);
+    }
+
+    public String highestRated(String cuisine) {
+        return cuisineToFoods.get(cuisine).first().name;
+    }
+}
+

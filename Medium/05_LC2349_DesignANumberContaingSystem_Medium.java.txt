@@ -1,0 +1,33 @@
+import java.util.*;
+
+class NumberContainers {
+
+    private final Map<Integer, Integer> indexToNumber = new HashMap<>();
+    private final Map<Integer, TreeSet<Integer>> numberToIndices = new HashMap<>();
+
+    public NumberContainers() {
+    }
+
+    public void change(int index, int number) {
+        Integer old = indexToNumber.get(index);
+
+        if (old != null) {
+            if (old == number) {
+                return;
+            }
+            TreeSet<Integer> oldSet = numberToIndices.get(old);
+            oldSet.remove(index);
+            if (oldSet.isEmpty()) {
+                numberToIndices.remove(old);
+            }
+        }
+
+        indexToNumber.put(index, number);
+        numberToIndices.computeIfAbsent(number, k -> new TreeSet<>()).add(index);
+    }
+
+    public int find(int number) {
+        TreeSet<Integer> set = numberToIndices.get(number);
+        return set == null ? -1 : set.first();
+    }
+}
